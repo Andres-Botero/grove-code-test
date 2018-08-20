@@ -2,10 +2,6 @@ import React from 'react';
 
 class EventNotification  extends React.Component {
 
-    constructor(props) {
-        super(props); 
-    }
-    
     componentDidMount(){
         this.requestPermission();
     }
@@ -16,7 +12,7 @@ class EventNotification  extends React.Component {
             function(db) {
                 setInterval(
                   () => self.checkDeadlines(db),
-                  5000
+                  10000
                 );
             }
         );
@@ -30,7 +26,7 @@ class EventNotification  extends React.Component {
         
             let indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
             // Open (or create) the database
-            var open  = window.indexedDB.open("GCalendar", 4);
+            let open  = indexedDB.open("GCalendar", 4);
             // Create the schema
             open.onupgradeneeded = function(event) {
                 let db = event.target.result;
@@ -39,7 +35,7 @@ class EventNotification  extends React.Component {
                 };
                 let objectStore = db.createObjectStore("EventList", { keyPath: "id", autoIncrement:true });
                 objectStore.createIndex("hours", "hours", { unique: false });
-                objectStore.createIndex("minutes", "minutes", { unique: true });
+                objectStore.createIndex("minutes", "minutes", { unique: false });
                 objectStore.createIndex("day", "day", { unique: false });
                 objectStore.createIndex("month", "month", { unique: false });
                 objectStore.createIndex("year", "year", { unique: false });
@@ -62,31 +58,20 @@ class EventNotification  extends React.Component {
 
         // open a read/write db transaction, ready for adding the data
         let transaction = db.transaction(["EventList"], "readwrite");
-        
-        // report on the success of opening the transaction
-        transaction.oncomplete = function(e) {
-            console.log('Transaction completed: database modification finished.',e);
-        };
-
-        transaction.onerror = function(e) {
-            console.log('Transaction not opened due to error',e.target.error);
-        };
-        
         let objectStore = transaction.objectStore("EventList");
-        let objectStoreRequest = objectStore.clear();
+        objectStore.clear();
 
         let calendar = this.props.calendar;
         
         for (let hour in calendar) {
             let date = new Date(hour);
-            let mi = date.getMinutes();
             let h = date.getHours();
             let d = date.getDate();
             let mo = date.getMonth()+1;
             let y = date.getFullYear(); 
             
             calendar[hour].forEach( function(evt) {
-               let event =  Object.assign({name: evt[1], hours: h, minutes: evt[0]+29, day: d, month: mo, year: y, notified: "no" });
+               let event =  Object.assign({name: evt[1], hours: h, minutes: evt[0], day: d, month: mo, year: y, notified: "no" });
                objectStore.put(event);
             })
         }    
@@ -107,24 +92,20 @@ class EventNotification  extends React.Component {
         let transaction = db.transaction(["EventList"], "readwrite");
         let objectStore = transaction.objectStore("EventList");
         
-        console.dir(objectStore.getAll());
         let self = this;
-        
         objectStore.openCursor().onsuccess = function(e) {
-          var cursor = e.target.result; 
-            if(cursor) {
-
-              if(+(cursor.value.hours) === hourCheck &&
-                 +(cursor.value.minutes) === minuteCheck && 
-                 +(cursor.value.day) === dayCheck && 
-                 cursor.value.month === monthCheck && 
-                 cursor.value.year === yearCheck && 
-                 cursor.value.notified == "no") {
-                 self.createNotification(cursor,db);
-              }
-
-                cursor.continue();
-            }
+            var cursor = e.target.result; 
+                if(cursor) {
+                    if(+(cursor.value.hours) === hourCheck &&
+                    +(cursor.value.minutes) === minuteCheck && 
+                    +(cursor.value.day) === dayCheck && 
+                    cursor.value.month === monthCheck && 
+                    cursor.value.year === yearCheck && 
+                    cursor.value.notified === "no") {
+                    self.createNotification(cursor,db);
+                    }
+                    cursor.continue();
+                }
 
         }
     }
