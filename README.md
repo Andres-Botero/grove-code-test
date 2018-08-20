@@ -1,4 +1,4 @@
-# UI/Front-End Code Test for Grove
+#Code Test for Grove
 
 ## 1. Installation
 
