@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css?family=Dosis:300,400,500,600,700|Poppins:300,400,500,600,700');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700');
+
+body {
+    font-family: Poppins,sans-serif;
+    color: #444;
+}
+
+h2 {
+    text-align: center;
+    font-weight: 600;
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+    height: 65px;
+    background-color: #3c4146;
+    border-bottom-color: #202326;
+}
+
+.header p, .header p a{
+    align-self: center;
+    color: #fff;
+    letter-spacing: 1px;
+    font-size: 20px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.footer {
+    display: flex;
+    justify-content: center;
+    border-top: solid 1px #f1f1f1;
+    padding: 30px 5px;
+    color: #8a8989;
+    font-size: 15px;
+    margin-top: 150px;
+}
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    min-height: 400px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
